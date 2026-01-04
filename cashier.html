@@ -1,0 +1,194 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <title>Cashier Master - Brother Trans</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;600;800&display=swap');
+        body { font-family: 'Plus Jakarta Sans', sans-serif; }
+    </style>
+</head>
+<body class="bg-gray-50 text-slate-900 min-h-screen pb-20">
+
+    <header class="bg-slate-900 text-white p-4 shadow-xl sticky top-0 z-50">
+        <div class="container mx-auto flex justify-between items-center">
+            <h1 class="text-xl font-black italic tracking-tighter uppercase">Brother <span class="text-yellow-400">Cashier</span></h1>
+            <div class="flex gap-2">
+                <a href="index.html" class="bg-slate-800 px-4 py-2 rounded-xl text-[10px] font-bold border border-slate-700">DASHBOARD</a>
+            </div>
+        </div>
+    </header>
+
+    <main class="container mx-auto p-4 md:p-8">
+        
+        <div class="grid grid-cols-1 md:grid-cols-4 gap-6 mb-10">
+            <div class="bg-slate-900 p-6 rounded-[2rem] shadow-xl"><p class="text-[9px] text-slate-400 font-black uppercase tracking-widest mb-1">Profit Real (Lunas)</p><p id="stat-balance" class="text-2xl font-black text-yellow-400">Rp 0</p></div>
+            <div class="bg-white p-6 rounded-[2rem] shadow-sm border border-l-8 border-l-green-500"><p class="text-[9px] text-gray-400 font-black uppercase tracking-widest mb-1">Total Pemasukan</p><p id="stat-paid" class="text-2xl font-black text-green-600">Rp 0</p></div>
+            <div class="bg-white p-6 rounded-[2rem] shadow-sm border border-l-8 border-l-red-500"><p class="text-[9px] text-gray-400 font-black uppercase tracking-widest mb-1">Piutang (Pending)</p><p id="stat-unpaid" class="text-2xl font-black text-red-500">Rp 0</p></div>
+            <div class="bg-white p-6 rounded-[2rem] shadow-sm border border-l-8 border-l-slate-300"><p class="text-[9px] text-gray-400 font-black uppercase tracking-widest mb-1">Pengeluaran</p><p id="stat-expense" class="text-2xl font-black text-slate-400">Rp 0</p></div>
+        </div>
+
+        <div class="grid grid-cols-1 lg:grid-cols-12 gap-8">
+            
+            <div class="lg:col-span-4 space-y-6">
+                
+                <div class="bg-slate-900 rounded-[2.5rem] p-8 text-white shadow-2xl">
+                    <h3 class="font-black text-[10px] uppercase tracking-widest mb-6 text-blue-400"><i class="fas fa-tools mr-2"></i> Workshop POS</h3>
+                    <form action="/api/workshop/sale" method="POST" class="space-y-4">
+                        <select name="plateNumber" id="work-select" required class="w-full p-4 bg-slate-800 rounded-2xl text-xs font-bold border-none outline-none"></select>
+                        <textarea name="customAction" placeholder="Jenis Servis / Tindakan..." rows="2" class="w-full p-4 bg-slate-800 border border-slate-700 rounded-2xl text-[11px] font-bold outline-none"></textarea>
+                        <div class="grid grid-cols-2 gap-2">
+                            <input type="number" name="laborFee" placeholder="Jasa (Rp)" class="w-full p-4 bg-slate-800 rounded-2xl font-bold outline-none">
+                            <select name="status" class="w-full p-4 bg-slate-800 rounded-2xl text-[9px] font-black uppercase text-yellow-400 outline-none">
+                                <option value="PAID">LUNAS</option>
+                                <option value="UNPAID">BILLING</option>
+                            </select>
+                        </div>
+                        <div class="p-4 bg-slate-800/50 rounded-2xl border border-slate-700 flex gap-2">
+                            <select name="selectedPartId" id="part-select" class="flex-1 bg-transparent text-[10px] font-bold outline-none"><option value="">-- Sparepart --</option></select>
+                            <input type="number" name="partQty" value="1" min="1" class="w-10 bg-slate-700 rounded-lg text-center font-black text-xs outline-none">
+                        </div>
+                        <button type="submit" class="w-full bg-blue-600 hover:bg-blue-500 py-4 rounded-2xl font-black uppercase text-[10px] tracking-widest transition">Proses Servis</button>
+                    </form>
+                </div>
+
+                <div class="bg-white rounded-[2.5rem] p-8 border-2 border-red-50 shadow-sm">
+                    <h3 class="font-black text-[10px] uppercase tracking-widest mb-6 text-red-500"><i class="fas fa-minus-circle mr-2"></i> Input Pengeluaran</h3>
+                    <form action="/api/cashier/add" method="POST" class="space-y-4">
+                        <input type="hidden" name="type" value="EXPENSE">
+                        <select name="category" required class="w-full p-4 bg-gray-50 rounded-2xl text-[10px] font-black uppercase outline-none">
+                            <option value="Operasional">OPERASIONAL (GAJI/LISTRIK)</option>
+                            <option value="Maintenance">MAINTENANCE (BIAYA UNIT)</option>
+                            <option value="Lain-lain">LAIN-LAIN</option>
+                        </select>
+                        <input type="number" name="amount" placeholder="Nominal Rp" required class="w-full p-4 bg-gray-50 rounded-2xl font-black text-red-500 text-lg outline-none">
+                        <input type="text" name="description" placeholder="Keterangan..." required class="w-full p-4 bg-gray-50 rounded-2xl text-[10px] font-bold outline-none">
+                        <button type="submit" class="w-full bg-red-500 text-white py-4 rounded-2xl font-black uppercase text-[10px] tracking-widest transition">Catat Pengeluaran</button>
+                    </form>
+                </div>
+
+                <div class="bg-white rounded-[2.5rem] p-8 border border-gray-100 shadow-sm">
+                    <h3 class="font-black text-[10px] uppercase tracking-widest mb-6 text-green-500"><i class="fas fa-key mr-2"></i> Rental POS</h3>
+                    <form action="/api/cashier/add" method="POST" class="space-y-4">
+                        <input type="hidden" name="type" value="INCOME">
+                        <input type="hidden" name="category" value="Sewa Motor">
+                        <select name="plateNumber" id="rent-select" required class="w-full p-4 bg-gray-50 rounded-2xl font-bold text-xs outline-none border-none"></select>
+                        <input type="number" name="amount" placeholder="Nominal Sewa (Rp)" required class="w-full p-4 bg-gray-50 rounded-2xl font-black text-green-600 outline-none">
+                        <select name="status" class="w-full p-4 bg-gray-50 rounded-2xl text-[10px] font-black uppercase text-slate-500 outline-none"><option value="PAID">LUNAS</option><option value="UNPAID">BELUM BAYAR</option></select>
+                        <button type="submit" class="w-full bg-slate-900 text-white py-4 rounded-2xl font-black uppercase text-[10px] tracking-widest transition">Input Sewa</button>
+                    </form>
+                </div>
+            </div>
+
+            <div class="lg:col-span-8">
+                <div class="bg-white rounded-[3rem] shadow-sm border border-gray-100 overflow-hidden">
+                    <div class="p-8 border-b flex justify-between items-center bg-gray-50/50">
+                        <div class="flex gap-2">
+                            <input type="month" id="filter-month" onchange="loadCashierData()" class="bg-white border p-3 rounded-2xl text-[10px] font-black uppercase outline-none">
+                            <select id="filter-plate" onchange="loadCashierData()" class="bg-white border p-3 rounded-2xl text-[10px] font-black uppercase outline-none"><option value="ALL">SEMUA UNIT</option></select>
+                        </div>
+                    </div>
+                    <div class="overflow-x-auto">
+                        <table class="w-full text-left">
+                            <thead class="bg-gray-50 text-gray-400 text-[9px] uppercase font-black tracking-widest">
+                                <tr><th class="p-6">Waktu</th><th class="p-6">Detail</th><th class="p-6 text-right">Nominal</th><th class="p-6 text-center">Aksi</th></tr>
+                            </thead>
+                            <tbody id="transaction-body" class="divide-y divide-gray-50 text-sm"></tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <script>
+        const formatR = (n) => new Intl.NumberFormat('id-ID', { style: 'currency', currency: 'IDR', minimumFractionDigits: 0 }).format(n);
+
+        async function loadCashierData() {
+            const [resT, resU] = await Promise.all([fetch('/api/transactions'), fetch('/api/units')]);
+            const transactions = await resT.json();
+            const units = await resU.json();
+
+            const month = document.getElementById('filter-month').value;
+            const plate = document.getElementById('filter-plate').value;
+
+            let filtered = transactions;
+            if (month) filtered = filtered.filter(t => (t.date || new Date(t.id).toISOString()).startsWith(month));
+            if (plate !== 'ALL') filtered = filtered.filter(t => t.plateNumber === plate);
+
+            let paidInc = 0, unpaidInc = 0, exp = 0;
+            const tbody = document.getElementById('transaction-body');
+            tbody.innerHTML = '';
+
+            filtered.reverse().forEach(t => {
+                const isPaid = t.status === 'PAID';
+                const isInc = t.type === 'INCOME';
+                if (isInc) isPaid ? paidInc += t.amount : unpaidInc += t.amount;
+                else exp += t.amount;
+
+                tbody.innerHTML += `
+                    <tr class="hover:bg-gray-50 transition border-b border-gray-50 last:border-0">
+                        <td class="p-6">
+                            <div class="text-[9px] font-bold text-gray-300 mb-1 uppercase">${new Date(t.date || t.id).toLocaleDateString('id-ID', {day:'2-digit', month:'short'})}</div>
+                            <div class="font-black text-slate-800 text-[10px] uppercase">${t.plateNumber || 'UMUM'}</div>
+                        </td>
+                        <td class="p-6">
+                            <div class="font-black text-slate-700 text-[10px] uppercase mb-1">${t.category}</div>
+                            <div class="text-[10px] text-gray-400 italic leading-tight">"${t.description || '-'}"</div>
+                        </td>
+                        <td class="p-6 text-right">
+                            <div class="mb-2"><span class="px-3 py-1 rounded-lg text-[8px] font-black uppercase ${t.type === 'EXPENSE' ? 'bg-slate-100 text-slate-400' : (isPaid ? 'bg-green-100 text-green-600' : 'bg-red-100 text-red-500')}">${t.type === 'EXPENSE' ? 'KELUAR' : (isPaid ? 'LUNAS' : 'PENDING')}</span></div>
+                            <div class="font-black text-sm">${formatR(t.amount)}</div>
+                        </td>
+                        <td class="p-6">
+                            <div class="flex justify-center space-x-2">
+                                ${!isPaid && isInc ? `<button onclick="markPaid(${t.id})" class="w-8 h-8 bg-green-500 text-white rounded-lg flex items-center justify-center shadow-lg hover:scale-110 transition"><i class="fas fa-check text-[10px]"></i></button>` : ''}
+                                <button onclick="delTrans(${t.id})" class="w-8 h-8 bg-gray-100 text-slate-300 hover:text-red-600 rounded-lg flex items-center justify-center transition"><i class="fas fa-trash-alt text-[10px]"></i></button>
+                            </div>
+                        </td>
+                    </tr>`;
+            });
+
+            document.getElementById('stat-paid').innerText = formatR(paidInc);
+            document.getElementById('stat-unpaid').innerText = formatR(unpaidInc);
+            document.getElementById('stat-expense').innerText = formatR(exp);
+            document.getElementById('stat-balance').innerText = formatR(paidInc - exp);
+        }
+
+        async function markPaid(id) {
+            await fetch(`/api/transactions/${id}/status`, { method: 'PATCH', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ status: 'PAID' }) });
+            loadCashierData();
+        }
+
+        async function delTrans(id) {
+            if (confirm("Hapus transaksi?")) { await fetch(`/api/transactions/${id}`, { method: 'DELETE' }); loadCashierData(); }
+        }
+
+        async function setup() {
+            const [resU, resP] = await Promise.all([fetch('/api/units'), fetch('/api/parts')]);
+            const units = await resU.json();
+            const parts = await resP.json();
+
+            const rs = document.getElementById('rent-select');
+            const ws = document.getElementById('work-select');
+            const fs = document.getElementById('filter-plate');
+            const ps = document.getElementById('part-select');
+
+            units.forEach(u => {
+                const opt = `<option value="${u.plate}">${u.plate} (${u.ownerName})</option>`;
+                ws.innerHTML += opt; fs.innerHTML += opt;
+                if(u.category === 'BROTHER') rs.innerHTML += opt;
+            });
+            parts.forEach(p => { if(p.stock > 0) ps.innerHTML += `<option value="${p.id}">${p.name} (Sisa: ${p.stock})</option>`; });
+
+            const now = new Date();
+            document.getElementById('filter-month').value = `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, '0')}`;
+            loadCashierData();
+        }
+
+        window.onload = setup;
+    </script>
+</body>
+</html>

@@ -1,0 +1,150 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <title>Brother Trans</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;600;800&display=swap');
+        body { font-family: 'Plus Jakarta Sans', sans-serif; }
+    </style>
+</head>
+<body class="bg-gray-50 text-slate-900 min-h-screen pb-20">
+
+    <header class="bg-slate-900 text-white p-6 shadow-xl sticky top-0 z-50">
+        <div class="container mx-auto flex items-center justify-between">
+            <div class="flex items-center space-x-4">
+                <a href="index.html" class="text-yellow-400 text-2xl hover:scale-110 transition"><i class="fas fa-arrow-left"></i></a>
+                <h1 class="text-xl font-black italic tracking-tighter uppercase leading-none">Brothers <span class="text-yellow-400">Trans</span></h1>
+            </div>
+        </div>
+    </header>
+
+    <main class="container mx-auto p-4 md:p-8 max-w-6xl">
+        <div class="bg-white rounded-[3rem] shadow-sm border border-gray-100 p-8 md:p-12 mb-10">
+            <h2 class="text-lg font-black text-slate-800 mb-8 uppercase tracking-widest flex items-center"><i class="fas fa-plus-circle mr-3 text-blue-500"></i> Tambah Kendaraan</h2>
+            <form action="/api/add-unit" method="POST" class="grid grid-cols-1 md:grid-cols-3 gap-6">
+                <div class="space-y-4">
+                    <label class="block text-[10px] font-black text-gray-400 uppercase ml-1">Kategori</label>
+                    <select name="category" required class="w-full px-5 py-4 bg-blue-50 border border-blue-100 rounded-2xl font-black text-blue-600 outline-none">
+                        <option value="BROTHER">ARMADA BROTHER TRANS</option>
+                        <option value="UMUM">UNIT UMUM (PELANGGAN)</option>
+                    </select>
+                    <input type="text" name="plate" placeholder="PLAT NOMOR" required class="w-full px-5 py-4 bg-gray-50 border border-gray-100 rounded-2xl font-black uppercase outline-none focus:ring-2 focus:ring-yellow-400">
+                </div>
+                <div class="md:col-span-2 space-y-4">
+                    <div class="grid grid-cols-2 gap-4">
+                        <input type="text" name="brand" placeholder="MERK/TIPE" required class="w-full px-5 py-4 bg-gray-50 border border-gray-100 rounded-2xl font-bold outline-none">
+                        <input type="number" name="year" placeholder="TAHUN" required class="w-full px-5 py-4 bg-gray-50 border border-gray-100 rounded-2xl font-bold outline-none">
+                    </div>
+                    <div class="grid grid-cols-2 gap-4">
+                        <input type="text" name="ownerName" placeholder="NAMA PEMILIK" required class="w-full px-5 py-4 bg-gray-50 border border-gray-100 rounded-2xl font-bold outline-none">
+                        <input type="text" name="ownerPhone" placeholder="WA (628...)" required class="w-full px-5 py-4 bg-gray-50 border border-gray-100 rounded-2xl font-bold outline-none">
+                    </div>
+                    <button type="submit" class="w-full bg-slate-900 text-yellow-400 font-black py-5 rounded-2xl shadow-xl uppercase text-xs tracking-[0.2em] hover:bg-black transition">Simpan Kendaraan</button>
+                </div>
+            </form>
+        </div>
+
+        <div class="bg-white rounded-[3rem] shadow-sm border border-gray-100 overflow-hidden">
+            <table class="w-full text-left">
+                <thead class="bg-gray-50 text-gray-400 text-[9px] uppercase font-black tracking-widest">
+                    <tr><th class="p-6">Kategori</th><th class="p-6">Unit</th><th class="p-6">Pemilik</th><th class="p-6 text-center">Aksi</th></tr>
+                </thead>
+                <tbody id="unit-list-body" class="divide-y divide-gray-50 text-sm font-medium"></tbody>
+            </table>
+        </div>
+    </main>
+
+    <div id="editUnitModal" class="fixed inset-0 bg-slate-900/90 hidden z-[100] flex items-center justify-center p-4 backdrop-blur-md">
+        <div class="bg-white rounded-[3rem] p-10 max-w-xl w-full shadow-2xl">
+            <h3 class="font-black text-xl uppercase mb-8 text-slate-800 italic">Modify <span class="text-blue-500">Unit</span></h3>
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <input type="hidden" id="edit-id">
+                <div class="col-span-2">
+                    <label class="text-[10px] font-black text-gray-400 uppercase ml-1">Kategori</label>
+                    <select id="edit-category" class="w-full p-4 bg-blue-50 rounded-2xl font-black text-blue-600 border-none outline-none">
+                        <option value="BROTHER">ARMADA BROTHER TRANS</option>
+                        <option value="UMUM">UNIT UMUM (PELANGGAN)</option>
+                    </select>
+                </div>
+                <div class="col-span-2">
+                    <input type="text" id="edit-plate" class="w-full p-4 bg-gray-50 rounded-2xl font-black uppercase outline-none border border-gray-100">
+                </div>
+                <input type="text" id="edit-owner" class="w-full p-4 bg-gray-50 rounded-2xl font-bold border border-gray-100">
+                <input type="text" id="edit-phone" class="w-full p-4 bg-gray-50 rounded-2xl font-bold border border-gray-100">
+            </div>
+            <div class="flex gap-4 pt-10">
+                <button onclick="closeEditModal()" class="flex-1 p-5 bg-gray-100 rounded-2xl font-black text-slate-400 uppercase text-xs">Batal</button>
+                <button onclick="saveUnitEdit()" class="flex-1 p-5 bg-slate-900 text-yellow-400 rounded-2xl font-black shadow-xl uppercase text-xs">Update</button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        async function loadUnits() {
+            const res = await fetch('/api/units');
+            const units = await res.json();
+            const tbody = document.getElementById('unit-list-body');
+            tbody.innerHTML = '';
+
+            units.reverse().forEach(u => {
+                const isBrother = u.category === 'BROTHER';
+                tbody.innerHTML += `
+                    <tr class="hover:bg-gray-50 transition border-b border-gray-50 last:border-0 group">
+                        <td class="p-6">
+                            <span class="px-4 py-1.5 rounded-full text-[9px] font-black uppercase tracking-widest ${isBrother ? 'bg-blue-100 text-blue-600' : 'bg-slate-100 text-slate-500'}">
+                                ${isBrother ? 'Brother Trans' : 'Unit Umum'}
+                            </span>
+                        </td>
+                        <td class="p-6">
+                            <div class="font-black text-slate-800 text-xl tracking-tighter uppercase leading-tight">${u.plate}</div>
+                            <div class="text-[10px] font-bold text-gray-400 uppercase mt-1">${u.brand || '-'} • ${u.year || '-'}</div>
+                        </td>
+                        <td class="p-6">
+                            <div class="font-black text-slate-700 uppercase text-xs mb-1">${u.ownerName || '-'}</div>
+                            <a href="https://wa.me/${u.ownerPhone}" target="_blank" class="text-green-500 font-black text-[10px]"><i class="fab fa-whatsapp"></i> HUBUNGI</a>
+                        </td>
+                        <td class="p-6">
+                            <div class="flex justify-center space-x-2">
+                                <button onclick='openEditModal(${JSON.stringify(u)})' class="w-11 h-11 rounded-2xl bg-white border border-gray-100 text-slate-300 hover:text-blue-600 transition shadow-sm flex items-center justify-center"><i class="fas fa-edit text-xs"></i></button>
+                                <button onclick="deleteUnit(${u.id}, '${u.plate}')" class="w-11 h-11 rounded-2xl bg-white border border-gray-100 text-red-200 hover:text-red-600 transition shadow-sm flex items-center justify-center"><i class="fas fa-trash-alt text-xs"></i></button>
+                                <a href="unit-detail.html?plate=${encodeURIComponent(u.plate)}" class="w-11 h-11 rounded-2xl bg-white border border-gray-100 text-slate-300 hover:text-slate-900 transition shadow-sm flex items-center justify-center"><i class="fas fa-history text-xs"></i></a>
+                            </div>
+                        </td>
+                    </tr>
+                `;
+            });
+        }
+
+        function openEditModal(u) {
+            document.getElementById('edit-id').value = u.id;
+            document.getElementById('edit-category').value = u.category || 'BROTHER';
+            document.getElementById('edit-plate').value = u.plate;
+            document.getElementById('edit-owner').value = u.ownerName;
+            document.getElementById('edit-phone').value = u.ownerPhone;
+            document.getElementById('editUnitModal').classList.remove('hidden');
+        }
+        function closeEditModal() { document.getElementById('editUnitModal').classList.add('hidden'); }
+        async function saveUnitEdit() {
+            const data = {
+                category: document.getElementById('edit-category').value,
+                plate: document.getElementById('edit-plate').value,
+                ownerName: document.getElementById('edit-owner').value,
+                ownerPhone: document.getElementById('edit-phone').value
+            };
+            const id = document.getElementById('edit-id').value;
+            const res = await fetch(`/api/units/${id}`, { method: 'PUT', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(data) });
+            if (res.ok) { closeEditModal(); loadUnits(); }
+        }
+        async function deleteUnit(id, plate) {
+            if (confirm(`Hapus unit ${plate} secara permanen?`)) {
+                await fetch(`/api/units/${id}`, { method: 'DELETE' });
+                loadUnits();
+            }
+        }
+        window.onload = loadUnits;
+    </script>
+</body>
+</html>
